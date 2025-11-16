@@ -1,0 +1,51 @@
+# Application version
+version: "0.1.0"
+
+# qBittorrent connection settings
+qbittorrent:
+  host: "localhost"
+  port: 8080
+  username: "admin"
+  password: "adminpass"
+  use_ssl: false
+
+# Module configurations
+modules:
+  # Tracker Checker Module
+  # Checks for non-working trackers and tags affected torrents
+  tracker_checker:
+    enabled: true
+    
+    # Categories to check (empty list = check all torrents)
+    categories: []
+    # categories: ["movies", "tv-shows"]
+    
+    # Tag to apply to torrents with broken trackers
+    tag: "broken-tracker"
+    
+    # Remove tag when all trackers are working again
+    remove_tag_when_fixed: true
+    
+    # Check tracker messages for error keywords
+    check_message_for_errors: true
+    
+    # Keywords to look for in tracker error messages
+    error_keywords:
+      - "not registered"
+      - "not found"
+      - "unregistered"
+      - "torrent not found"
+      - "invalid passkey"
+      - "passkey"
+      - "banned"
+      - "not authorized"
+
+  # Example: Future module template (disabled)
+  # example_module:
+  #   enabled: false
+  #   some_setting: "value"
+
+# Scheduling (for future use with cron or internal scheduler)
+scheduling:
+  enabled: false
+  interval_minutes: 60

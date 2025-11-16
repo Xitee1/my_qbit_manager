@@ -1,0 +1,50 @@
+services:
+  qbit-manager:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: qbit-manager
+    
+    # Environment variables (override config.yaml)
+    environment:
+      - QBIT_HOST=${QBIT_HOST:-localhost}
+      - QBIT_PORT=${QBIT_PORT:-8080}
+      - QBIT_USERNAME=${QBIT_USERNAME:-admin}
+      - QBIT_PASSWORD=${QBIT_PASSWORD:-adminpass}
+      - QBIT_USE_SSL=${QBIT_USE_SSL:-false}
+    
+    # Mount volumes
+    volumes:
+      # Configuration file
+      - ./config/config.yaml:/app/config/config.yaml:ro
+      # Optional: mount custom modules (for development)
+      # - ./src/my_qbit_manager/modules:/app/src/my_qbit_manager/modules:ro
+    
+    restart: unless-stopped
+
+networks:
+  qbit-network:
+    driver: bridge
+
+# Example with cron scheduler (run periodically)
+# Uncomment the service below to run the manager on a schedule
+#
+# services:
+#   qbit-manager-cron:
+#     build:
+#       context: .
+#       dockerfile: docker/Dockerfile.cron
+#     container_name: qbit-manager-cron
+#     restart: unless-stopped
+#     environment:
+#       - QBIT_HOST=${QBIT_HOST:-localhost}
+#       - QBIT_PORT=${QBIT_PORT:-8080}
+#       - QBIT_USERNAME=${QBIT_USERNAME:-admin}
+#       - QBIT_PASSWORD=${QBIT_PASSWORD:-adminpass}
+#       - QBIT_USE_SSL=${QBIT_USE_SSL:-false}
+#       - CRON_SCHEDULE=0 */6 * * *  # Run every 6 hours
+#     volumes:
+#       - ./config/config.yaml:/app/config/config.yaml:ro
+#       - ./logs:/app/logs
+#     networks:
+#       - qbit-network
