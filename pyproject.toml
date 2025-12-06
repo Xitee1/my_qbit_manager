@@ -1,6 +1,6 @@
 [build-system]
-requires = ["setuptools>=61.0", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [project]
 name = "my-qbit-manager"
@@ -49,11 +49,8 @@ Homepage = "https://github.com/yourusername/my-qbit-manager"
 Repository = "https://github.com/yourusername/my-qbit-manager"
 Issues = "https://github.com/yourusername/my-qbit-manager/issues"
 
-[tool.setuptools.packages.find]
-where = ["src"]
-
-[tool.setuptools.package-data]
-my_qbit_manager = ["py.typed"]
+[tool.hatch.build.targets.wheel]
+packages = ["src/my_qbit_manager"]
 
 [tool.black]
 line-length = 100
