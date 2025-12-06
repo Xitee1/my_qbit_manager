@@ -56,10 +56,10 @@ my_qbit_manager/
 3. **Edit the configuration**:
    ```bash
    nano config/config.yaml
-   # Update qBittorrent connection details and module settings
+   # Configure module settings and schedules
    ```
 
-4. **Run with Docker Compose**:
+4. **Run with Docker Compose** (scheduler mode - runs continuously):
    ```bash
    docker-compose up -d
    ```
@@ -75,9 +75,9 @@ my_qbit_manager/
 
 1. **Install Python 3.8 or higher**
 
-2. **Install dependencies**:
+2. **Install the package**:
    ```bash
-   pip install -r requirements.txt
+   pip install -e .
    ```
 
 3. **Configure the application**:
@@ -88,20 +88,29 @@ my_qbit_manager/
 
 4. **Run the application**:
    ```bash
-   python -m my_qbit_manager.main
+   # Run once and exit
+   python -m my_qbit_manager.main --mode once
+   
+   # Run scheduler (continuous mode with per-module schedules)
+   python -m my_qbit_manager.main --mode scheduler
+   
+   # Run a specific module
+   python -m my_qbit_manager.main --mode module --module tracker_checker
    ```
 
 ## Configuration
 
 ### Environment Variables
 
-Configuration can be set via environment variables (these override `config.yaml`):
+Environment variables **always take priority** over `config.yaml` for qBittorrent settings:
 
 - `QBIT_HOST`: qBittorrent host address
 - `QBIT_PORT`: qBittorrent port
 - `QBIT_USERNAME`: qBittorrent username
 - `QBIT_PASSWORD`: qBittorrent password
 - `QBIT_USE_SSL`: Use HTTPS (true/false)
+
+**Note**: Only qBittorrent connection settings can be overridden via environment variables. All other settings (modules, schedules, etc.) must be configured in `config.yaml`.
 
 ### config.yaml
 
@@ -118,6 +127,11 @@ qbittorrent:
 modules:
   tracker_checker:
     enabled: true
+    # Per-module scheduling
+    schedule:
+      enabled: true
+      interval_minutes: 360  # Run every 6 hours
+      run_on_start: true     # Run immediately when scheduler starts
     categories: []  # Empty = check all torrents
     tag: "broken-tracker"
     remove_tag_when_fixed: true
@@ -143,6 +157,10 @@ Monitors torrent trackers and tags torrents with non-working trackers.
 ```yaml
 tracker_checker:
   enabled: true
+  schedule:
+    enabled: true           # Enable scheduled execution
+    interval_minutes: 360   # Run every 6 hours
+    run_on_start: true      # Run immediately on start
   categories: []  # Filter by categories, or [] for all
   tag: "broken-tracker"
   remove_tag_when_fixed: true
@@ -182,55 +200,66 @@ To create a new module:
 ## Command Line Options
 
 ```bash
-# Run all enabled modules
-python -m my_qbit_manager.main
+# Run all enabled modules once and exit
+python -m my_qbit_manager.main --mode once
+
+# Run scheduler (continuous mode with per-module schedules)
+python -m my_qbit_manager.main --mode scheduler
+
+# Run scheduler with custom check interval
+python -m my_qbit_manager.main --mode scheduler --check-interval 30
 
 # Run a specific module
-python -m my_qbit_manager.main --module tracker_checker
+python -m my_qbit_manager.main --mode module --module tracker_checker
 
 # Use a custom config file
-python -m my_qbit_manager.main --config /path/to/config.yaml
+python -m my_qbit_manager.main --config /path/to/config.yaml --mode once
 
 # Show version
 python -m my_qbit_manager.main --version
 ```
 
+### Execution Modes
+
+- **once**: Run all enabled modules once and exit (default for manual execution)
+- **scheduler**: Run modules continuously based on their individual schedules (default for Docker)
+- **module**: Run a specific module once
+
 ## Docker Deployment
+
+### Scheduler Service (Default)
+
+The default Docker Compose configuration runs the scheduler service, which executes modules based on their individual schedules:
+
+```bash
+docker-compose up -d
+```
+
+This runs continuously and checks module schedules every minute. Each module's schedule is configured in `config.yaml`.
 
 ### One-time Execution
 
-Use the standard docker-compose setup to run the manager once:
+To run all modules once and exit:
 
 ```bash
-docker-compose up
+docker-compose run --rm qbit-manager --mode once
 ```
 
-### Scheduled Execution (Cron)
+### Service Architecture
 
-To run the manager on a schedule, uncomment the cron service in `docker-compose.yml`:
+The Docker setup is designed to be extensible:
+- **Scheduler service**: Current default (runs modules on their schedules)
+- **One-time service**: Run on-demand or via external scheduler
+- **API service**: Future enhancement (not yet implemented)
 
-```yaml
-services:
-  qbit-manager-cron:
-    build:
-      context: .
-      dockerfile: docker/Dockerfile.cron
-    environment:
-      - CRON_SCHEDULE=0 */6 * * *  # Every 6 hours
-    # ... other settings
-```
-
-Then start with:
-```bash
-docker-compose up -d qbit-manager-cron
-```
+The same Docker image supports all modes via command-line arguments.
 
 ## Development
 
 ### Install Development Dependencies
 
 ```bash
-pip install -r requirements-dev.txt
+pip install -e ".[dev]"
 ```
 
 ### Run Tests

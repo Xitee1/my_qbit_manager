@@ -26,6 +26,8 @@ class ConfigManager:
     def load_config(self) -> Dict[str, Any]:
         """
         Load configuration from YAML file and merge with environment variables.
+        
+        Environment variables take priority over config.yaml for qBittorrent settings.
 
         Returns:
             Dictionary containing the merged configuration
@@ -42,7 +44,7 @@ class ConfigManager:
         with open(self.config_path, 'r') as f:
             self.config = yaml.safe_load(f)
 
-        # Override with environment variables if present
+        # Override qBittorrent settings with environment variables (takes priority)
         self._apply_env_overrides()
 
         # Validate configuration
@@ -52,20 +54,45 @@ class ConfigManager:
         return self.config
 
     def _apply_env_overrides(self):
-        """Apply environment variable overrides to configuration."""
-        # qBittorrent connection settings
+        """
+        Apply environment variable overrides to qBittorrent configuration.
+        
+        Environment variables ALWAYS take priority over config.yaml values.
+        Only qBittorrent settings can be overridden via environment variables.
+        """
+        # Ensure qbittorrent section exists
+        if 'qbittorrent' not in self.config:
+            self.config['qbittorrent'] = {}
+        
+        qbit_config = self.config['qbittorrent']
+        overrides_applied = []
+        
+        # qBittorrent connection settings - env vars always take priority
         if os.getenv('QBIT_HOST'):
-            self.config.setdefault('qbittorrent', {})['host'] = os.getenv('QBIT_HOST')
+            qbit_config['host'] = os.getenv('QBIT_HOST')
+            overrides_applied.append('host')
+        
         if os.getenv('QBIT_PORT'):
-            self.config.setdefault('qbittorrent', {})['port'] = int(os.getenv('QBIT_PORT'))
+            qbit_config['port'] = int(os.getenv('QBIT_PORT'))
+            overrides_applied.append('port')
+        
         if os.getenv('QBIT_USERNAME'):
-            self.config.setdefault('qbittorrent', {})['username'] = os.getenv('QBIT_USERNAME')
+            qbit_config['username'] = os.getenv('QBIT_USERNAME')
+            overrides_applied.append('username')
+        
         if os.getenv('QBIT_PASSWORD'):
-            self.config.setdefault('qbittorrent', {})['password'] = os.getenv('QBIT_PASSWORD')
+            qbit_config['password'] = os.getenv('QBIT_PASSWORD')
+            overrides_applied.append('password')
+        
         if os.getenv('QBIT_USE_SSL'):
-            self.config.setdefault('qbittorrent', {})['use_ssl'] = os.getenv('QBIT_USE_SSL').lower() == 'true'
+            qbit_config['use_ssl'] = os.getenv('QBIT_USE_SSL').lower() == 'true'
+            overrides_applied.append('use_ssl')
 
-        logger.debug("Applied environment variable overrides")
+        if overrides_applied:
+            logger.info("Environment variable overrides applied for qBittorrent settings: %s", 
+                       ', '.join(overrides_applied))
+        else:
+            logger.debug("No environment variable overrides found")
 
     def _validate_config(self):
         """

@@ -8,6 +8,7 @@ from typing import Optional
 from my_qbit_manager.config_manager import ConfigManager
 from my_qbit_manager.module_manager import ModuleManager
 from my_qbit_manager.qbit_client import QBitClient
+from my_qbit_manager.scheduler import ModuleScheduler
 
 # Setup logging
 logging.basicConfig(
@@ -50,9 +51,9 @@ class QBitManager:
         # Initialize module manager
         self.module_manager = ModuleManager(self.config, self.qbit_client)
 
-    def run(self):
-        """Run all enabled modules."""
-        logger.info("Starting qBittorrent Manager")
+    def run_once(self):
+        """Run all enabled modules once and exit."""
+        logger.info("Starting qBittorrent Manager (run once mode)")
         
         try:
             # Connect to qBittorrent
@@ -75,6 +76,42 @@ class QBitManager:
         finally:
             self.qbit_client.disconnect()
             logger.info("qBittorrent Manager finished")
+    
+    def run_scheduler(self, check_interval: int = 60):
+        """
+        Run the scheduler to execute modules based on their individual schedules.
+        
+        Args:
+            check_interval: How often to check if modules should run (in seconds)
+        
+        Returns:
+            True if scheduler exits normally, False on error
+        """
+        logger.info("Starting qBittorrent Manager (scheduler mode)")
+        
+        try:
+            # Connect to qBittorrent
+            if not self.qbit_client.connect():
+                logger.error("Failed to connect to qBittorrent. Exiting.")
+                return False
+            
+            logger.info("Successfully connected to qBittorrent")
+            
+            # Create and run scheduler
+            scheduler = ModuleScheduler(self.module_manager, self.config)
+            scheduler.run_scheduler_loop(check_interval_seconds=check_interval)
+            
+            return True
+            
+        except KeyboardInterrupt:
+            logger.info("Scheduler stopped by user")
+            return True
+        except Exception as e:
+            logger.exception("An error occurred during scheduler execution: %s", e)
+            return False
+        finally:
+            self.qbit_client.disconnect()
+            logger.info("qBittorrent Manager scheduler stopped")
 
     def run_specific_module(self, module_name: str):
         """
@@ -114,9 +151,22 @@ def main():
         help='Path to configuration file (default: config/config.yaml)'
     )
     parser.add_argument(
+        '--mode',
+        type=str,
+        choices=['once', 'scheduler', 'module'],
+        default='once',
+        help='Execution mode: once (run all modules once), scheduler (continuous scheduling), module (run specific module)'
+    )
+    parser.add_argument(
         '--module',
         type=str,
-        help='Run a specific module instead of all enabled modules'
+        help='Run a specific module (requires --mode module)'
+    )
+    parser.add_argument(
+        '--check-interval',
+        type=int,
+        default=60,
+        help='Scheduler check interval in seconds (default: 60)'
     )
     parser.add_argument(
         '--version',
@@ -128,10 +178,15 @@ def main():
     
     manager = QBitManager(config_path=args.config)
     
-    if args.module:
+    if args.mode == 'module':
+        if not args.module:
+            logger.error("--module argument required when using --mode module")
+            sys.exit(1)
         success = manager.run_specific_module(args.module)
-    else:
-        success = manager.run()
+    elif args.mode == 'scheduler':
+        success = manager.run_scheduler(check_interval=args.check_interval)
+    else:  # once
+        success = manager.run_once()
     
     sys.exit(0 if success else 1)
 

@@ -16,6 +16,12 @@ modules:
   tracker_checker:
     enabled: true
     
+    # Module scheduling (per-module configuration)
+    schedule:
+      enabled: true               # Enable scheduled execution
+      interval_minutes: 360       # Run every 6 hours
+      run_on_start: true          # Run immediately when scheduler starts
+    
     # Categories to check (empty list = check all torrents)
     categories: []
     # categories: ["movies", "tv-shows"]
@@ -40,12 +46,3 @@ modules:
       - "banned"
       - "not authorized"
 
-  # Example: Future module template (disabled)
-  # example_module:
-  #   enabled: false
-  #   some_setting: "value"
-
-# Scheduling (for future use with cron or internal scheduler)
-scheduling:
-  enabled: false
-  interval_minutes: 60

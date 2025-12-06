@@ -54,21 +54,25 @@
    venv\Scripts\activate  # On Windows
    ```
 
-3. **Install dependencies**:
+3. **Install the package**:
    ```bash
-   pip install -r requirements.txt
+   pip install -e .
    ```
 
 4. **Set up configuration**:
    ```bash
    cp .env.example .env
    nano .env  # Edit with your credentials
-   nano config/config.yaml  # Adjust settings
+   nano config/config.yaml  # Adjust settings and schedules
    ```
 
 5. **Run the application**:
    ```bash
-   python -m my_qbit_manager.main
+   # Run once and exit
+   python -m my_qbit_manager.main --mode once
+   
+   # Run scheduler (continuous mode)
+   python -m my_qbit_manager.main --mode scheduler
    ```
 
 ### Using Makefile (Linux/Mac)
@@ -117,12 +121,16 @@ Or use environment variables (override config.yaml):
 
 ### Module Configuration
 
-Enable/disable modules and configure their behavior in `config/config.yaml`:
+Enable/disable modules and configure their behavior and schedules in `config/config.yaml`:
 
 ```yaml
 modules:
   tracker_checker:
     enabled: true
+    schedule:
+      enabled: true           # Enable scheduled execution
+      interval_minutes: 360   # Run every 6 hours
+      run_on_start: true      # Run immediately when scheduler starts
     categories: []  # Filter by categories, or [] for all torrents
     tag: "broken-tracker"
     remove_tag_when_fixed: true
@@ -132,11 +140,17 @@ modules:
 
 1. **Test qBittorrent connection**:
    ```bash
-   # Docker
-   docker-compose logs
+   # Docker (scheduler mode - default)
+   docker-compose up
    
-   # Local
-   python -m my_qbit_manager.main
+   # Docker (one-time execution)
+   docker-compose run --rm qbit-manager --mode once
+   
+   # Local (run once)
+   python -m my_qbit_manager.main --mode once
+   
+   # Local (scheduler mode)
+   python -m my_qbit_manager.main --mode scheduler
    ```
 
 2. **Check for errors** in the logs:
