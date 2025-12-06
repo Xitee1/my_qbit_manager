@@ -4,61 +4,51 @@ _Warning: This is a vibe coded tool, most of it is unchecked because I personall
 
 A modular, extensible tool for managing qBittorrent torrents with automatic tracker health monitoring and other automation features.
 
-## Quick Start
+## Installation
+1. Create a new docker-compose.yaml file
 
-### Using Docker Compose (Recommended)
+2. Copy the content of docker-compose.prod.yaml
 
-1. **Clone or create the project directory**
-
-2. **Copy and configure environment variables**:
+3. Start with:
    ```bash
-   cp .env.example .env
-   # Edit .env with your qBittorrent credentials
+   docker-compose up -d
    ```
 
 3. **Edit the configuration**:
    ```bash
    nano config/config.yaml
-   # Configure module settings and schedules
+   # Configure your qBittorrent connection and module settings
    ```
 
-4. **Run with Docker Compose** (scheduler mode - runs continuously):
+
+---
+
+## Development setup
+
+### With docker
+
+1. **Run with Docker Compose** (builds locally, mounts source code):
    ```bash
-   docker-compose up -d
+   docker-compose up
    ```
 
-5. **View logs**:
+
+### Local Python Development (Without Docker)
+
+1. **Create a virtual environment** (recommended):
    ```bash
-   docker-compose logs -f
-   # or check the logs directory
-   tail -f logs/qbit_manager.log
+   python -m venv .venv
+   source .venv/bin/activate  # On Windows: .venv\Scripts\activate
    ```
-
-### Manual Installation
-
-1. **Install Python 3.8 or higher**
 
 2. **Install the package**:
    ```bash
    pip install -e .
    ```
 
-3. **Configure the application**:
+5. Start:
    ```bash
-   cp .env.example .env
-   # Edit .env and config/config.yaml
-   ```
-
-4. **Run the application**:
-   ```bash
-   # Run once and exit
    python -m my_qbit_manager.main --mode once
-   
-   # Run scheduler (continuous mode with per-module schedules)
-   python -m my_qbit_manager.main --mode scheduler
-   
-   # Run a specific module
-   python -m my_qbit_manager.main --mode module --module tracker_checker
    ```
 
 ## Configuration
@@ -131,30 +121,11 @@ python -m my_qbit_manager.main --config /path/to/config.yaml
 python -m my_qbit_manager.main --version
 ```
 
-## Docker Deployment
-
-### Scheduler Service (Default)
-
-The default Docker Compose configuration runs the scheduler service, which executes modules based on their individual schedules:
-
-```bash
-docker-compose up -d
-```
-
-This runs continuously and checks module schedules every minute. Each module's schedule is configured in `config.yaml`.
-
-### One-time Execution
-
-To run all modules once and exit:
-
-```bash
-docker-compose run --rm qbit-manager --mode once
-```
 
 ### Service Architecture
 
 The Docker setup is designed to be extensible:
-- **Scheduler service**: Current default (runs modules on their schedules)
+- **Scheduler service**: Default mode (runs modules on their configured schedules)
 - **One-time service**: Run on-demand or via external scheduler
 - **API service**: Future enhancement (not yet implemented)
 
