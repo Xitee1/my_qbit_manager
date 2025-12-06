@@ -140,10 +140,8 @@ cython_debug/
 *~
 
 # Project specific
-logs/*.log
-logs/*.log.*
-config/config.local.yaml
 .DS_Store
+data
 
 # Docker
 *.pid
