@@ -2,45 +2,6 @@
 
 A modular, extensible tool for managing qBittorrent torrents with automatic tracker health monitoring and other automation features.
 
-## Features
-
-- 🔌 **Modular Architecture**: Easy to add new features as independent modules
-- 🏷️ **Tracker Checker**: Automatically detects and tags torrents with non-working trackers
-- ⚙️ **Configurable**: YAML-based configuration with environment variable support
-- 🐳 **Dockerized**: Ready to run in Docker with docker-compose
-- 📊 **Comprehensive Logging**: Detailed logs for monitoring and debugging
-- 🔄 **Extensible**: Simple base class for creating new modules
-
-## Project Structure
-
-```
-my_qbit_manager/
-├── src/
-│   └── my_qbit_manager/
-│       ├── __init__.py
-│       ├── main.py              # Application entry point
-│       ├── config_manager.py    # Configuration handling
-│       ├── qbit_client.py       # qBittorrent API wrapper
-│       ├── module_manager.py    # Module loading and execution
-│       ├── modules/
-│       │   ├── __init__.py
-│       │   ├── base_module.py   # Base class for all modules
-│       │   └── tracker_checker.py  # Tracker health checker module
-│       └── utils/
-├── config/
-│   └── config.yaml              # Main configuration file
-├── tests/                       # Unit tests
-├── docker/
-│   ├── Dockerfile.cron         # Dockerfile with cron scheduler
-│   └── entrypoint-cron.sh      # Cron entrypoint script
-├── logs/                        # Application logs
-├── Dockerfile                   # Main Dockerfile
-├── docker-compose.yml          # Docker Compose configuration
-├── pyproject.toml              # Project metadata and dependencies
-├── requirements.txt            # Python dependencies
-└── README.md                   # This file
-```
-
 ## Quick Start
 
 ### Using Docker Compose (Recommended)
@@ -111,31 +72,6 @@ Environment variables **always take priority** over `config.yaml` for qBittorren
 - `QBIT_USE_SSL`: Use HTTPS (true/false)
 
 **Note**: Only qBittorrent connection settings can be overridden via environment variables. All other settings (modules, schedules, etc.) must be configured in `config.yaml`.
-
-### config.yaml
-
-The main configuration file controls all aspects of the application:
-
-```yaml
-qbittorrent:
-  host: "localhost"
-  port: 8080
-  username: "admin"
-  password: "adminpass"
-  use_ssl: false
-
-modules:
-  tracker_checker:
-    enabled: true
-    # Per-module scheduling
-    schedule:
-      enabled: true
-      interval_minutes: 360  # Run every 6 hours
-      run_on_start: true     # Run immediately when scheduler starts
-    categories: []  # Empty = check all torrents
-    tag: "broken-tracker"
-    remove_tag_when_fixed: true
-```
 
 ## Modules
 
