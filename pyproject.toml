@@ -1,34 +1,27 @@
 [build-system]
-requires = ["hatchling"]
+requires = [
+  "hatchling",
+  "hatch-vcs"
+]
 build-backend = "hatchling.build"
 
 [project]
 name = "my-qbit-manager"
-version = "0.1.0"
+dynamic = ["version"]
 description = "A modular tool for managing qBittorrent torrents"
 readme = "README.md"
-requires-python = ">=3.8"
-license = {text = "MIT"}
-authors = [
-    {name = "Your Name", email = "your.email@example.com"}
-]
-keywords = ["qbittorrent", "torrent", "automation", "manager"]
+requires-python = ">=3.9"
 classifiers = [
-    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Operating System :: OS Independent",
     "Intended Audience :: End Users/Desktop",
-    "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
 ]
 
 dependencies = [
-    "qbittorrent-api>=2024.1.59",
-    "pyyaml>=6.0",
-    "python-dotenv>=1.0.0",
+    "qbittorrent-api>=2025.11.1",
+    "pyyaml>=6.0.3",
+    "python-dotenv>=1.2.1",
 ]
 
 [project.optional-dependencies]
@@ -41,61 +34,13 @@ dev = [
     "pylint>=2.17.0",
 ]
 
-[project.scripts]
-qbit-manager = "my_qbit_manager.main:main"
-
 [project.urls]
 Homepage = "https://github.com/yourusername/my-qbit-manager"
 Repository = "https://github.com/yourusername/my-qbit-manager"
 Issues = "https://github.com/yourusername/my-qbit-manager/issues"
 
-[tool.hatch.build.targets.wheel]
-packages = ["src/my_qbit_manager"]
+[project.scripts]
+qbit-manager = "my_qbit_manager.main:main"
 
-[tool.black]
-line-length = 100
-target-version = ['py38', 'py39', 'py310', 'py311']
-include = '\.pyi?$'
-extend-exclude = '''
-/(
-  # directories
-  \.eggs
-  | \.git
-  | \.hg
-  | \.mypy_cache
-  | \.tox
-  | \.venv
-  | build
-  | dist
-)/
-'''
-
-[tool.pytest.ini_options]
-testpaths = ["tests"]
-python_files = ["test_*.py"]
-python_classes = ["Test*"]
-python_functions = ["test_*"]
-addopts = [
-    "--verbose",
-    "--cov=my_qbit_manager",
-    "--cov-report=term-missing",
-    "--cov-report=html",
-]
-
-[tool.mypy]
-python_version = "3.8"
-warn_return_any = true
-warn_unused_configs = true
-disallow_untyped_defs = false
-disallow_incomplete_defs = false
-check_untyped_defs = true
-no_implicit_optional = true
-warn_redundant_casts = true
-warn_unused_ignores = true
-warn_no_return = true
-warn_unreachable = true
-strict_equality = true
-
-[[tool.mypy.overrides]]
-module = ["qbittorrentapi.*"]
-ignore_missing_imports = true
+[tool.hatch.version]
+source = "vcs"

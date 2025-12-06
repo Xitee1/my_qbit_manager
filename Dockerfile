@@ -7,11 +7,11 @@ WORKDIR /app
 # Install build dependencies
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-    gcc \
+    git \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy pyproject.toml for dependency installation
-COPY pyproject.toml .
+# Copy project files
+COPY . /app
 
 # Install Python dependencies
 RUN pip install --no-cache-dir --user .
