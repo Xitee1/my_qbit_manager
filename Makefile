@@ -7,17 +7,19 @@ help: ## Show this help message
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-20s\033[0m %s\n", $$1, $$2}'
 
 install: ## Install production dependencies
-	pip install -r requirements.txt
+	pip install -e .
 
 install-dev: ## Install development dependencies
-	pip install -r requirements.txt
-	pip install -r requirements-dev.txt
+	pip install -e ".[dev]"
 
-run: ## Run the application
-	python -m my_qbit_manager.main
+run: ## Run the application once
+	python -m my_qbit_manager.main --mode once
+
+run-scheduler: ## Run the scheduler
+	python -m my_qbit_manager.main --mode scheduler
 
 run-module: ## Run a specific module (use MODULE=module_name)
-	python -m my_qbit_manager.main --module $(MODULE)
+	python -m my_qbit_manager.main --mode module --module $(MODULE)
 
 test: ## Run tests
 	pytest tests/ -v

@@ -10,11 +10,11 @@ RUN apt-get update && \
     gcc \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements first for better layer caching
-COPY requirements.txt .
+# Copy pyproject.toml for dependency installation
+COPY pyproject.toml .
 
 # Install Python dependencies
-RUN pip install --no-cache-dir --user -r requirements.txt
+RUN pip install --no-cache-dir --user .
 
 # Final stage
 FROM python:3.11-slim
@@ -48,5 +48,8 @@ USER qbitmanager
 HEALTHCHECK --interval=5m --timeout=3s \
     CMD python -c "import sys; sys.exit(0)"
 
-# Run the application
-CMD ["python", "-m", "my_qbit_manager.main"]
+# Default entrypoint - can be overridden for different service modes
+ENTRYPOINT ["python", "-m", "my_qbit_manager.main"]
+
+# Default command - run in scheduler mode
+CMD ["--mode", "scheduler"]

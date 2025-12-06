@@ -38,15 +38,12 @@ docs/
 # Development
 .env
 .env.example
-requirements-dev.txt
 
 # Logs (keep empty directory structure)
 logs/*.log
 logs/*.log.*
 
 # Docker
-Dockerfile.cron
-docker/
 docker-compose.yml
 docker-compose.*.yml
 
