@@ -84,30 +84,10 @@ Environment variables **always take priority** over `config.yaml` for qBittorren
 Monitors torrent trackers and tags torrents with non-working trackers.
 
 **Features**:
-- Checks all trackers for each torrent
-- Detects tracker failures by status code
-- Analyzes tracker error messages
-- Applies configurable tags to affected torrents
-- Optionally filters by category
-- Automatically removes tags when trackers are working again
+- Tags torrents with not working trackers (and removes the tag if it's working again)
+- Define amount of minimum working trackers (if a torrent has less than the minimum tracker amount, all of them must be available)
+- Restrict to specific categories
 
-**Configuration**:
-```yaml
-tracker_checker:
-  enabled: true
-  schedule:
-    enabled: true           # Enable scheduled execution
-    interval_minutes: 360   # Run every 6 hours
-    run_on_start: true      # Run immediately on start
-  categories: []  # Filter by categories, or [] for all
-  tag: "broken-tracker"
-  remove_tag_when_fixed: true
-  check_message_for_errors: true
-  error_keywords:
-    - "not registered"
-    - "invalid passkey"
-    # ... more keywords
-```
 
 ### Creating New Modules
 
