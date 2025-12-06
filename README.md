@@ -136,30 +136,18 @@ To create a new module:
 ## Command Line Options
 
 ```bash
-# Run all enabled modules once and exit
-python -m my_qbit_manager.main --mode once
+# Run as service with configured schedulers
+python -m my_qbit_manager.main
 
-# Run scheduler (continuous mode with per-module schedules)
-python -m my_qbit_manager.main --mode scheduler
+# Run a specific module once
+python -m my_qbit_manager.main --module tracker_checker
 
-# Run scheduler with custom check interval
-python -m my_qbit_manager.main --mode scheduler --check-interval 30
-
-# Run a specific module
-python -m my_qbit_manager.main --mode module --module tracker_checker
-
-# Use a custom config file
-python -m my_qbit_manager.main --config /path/to/config.yaml --mode once
+# Use a specific config file
+python -m my_qbit_manager.main --config /path/to/config.yaml
 
 # Show version
 python -m my_qbit_manager.main --version
 ```
-
-### Execution Modes
-
-- **once**: Run all enabled modules once and exit (default for manual execution)
-- **scheduler**: Run modules continuously based on their individual schedules (default for Docker)
-- **module**: Run a specific module once
 
 ## Docker Deployment
 

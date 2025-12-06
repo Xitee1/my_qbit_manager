@@ -151,22 +151,9 @@ def main():
         help='Path to configuration file (default: config/config.yaml)'
     )
     parser.add_argument(
-        '--mode',
-        type=str,
-        choices=['once', 'scheduler', 'module'],
-        default='once',
-        help='Execution mode: once (run all modules once), scheduler (continuous scheduling), module (run specific module)'
-    )
-    parser.add_argument(
         '--module',
         type=str,
-        help='Run a specific module (requires --mode module)'
-    )
-    parser.add_argument(
-        '--check-interval',
-        type=int,
-        default=60,
-        help='Scheduler check interval in seconds (default: 60)'
+        help='Run a specific module once'
     )
     parser.add_argument(
         '--version',
@@ -178,15 +165,12 @@ def main():
     
     manager = QBitManager(config_path=args.config)
     
-    if args.mode == 'module':
-        if not args.module:
-            logger.error("--module argument required when using --mode module")
-            sys.exit(1)
+    # If --module is specified, run that specific module once
+    if args.module:
         success = manager.run_specific_module(args.module)
-    elif args.mode == 'scheduler':
-        success = manager.run_scheduler(check_interval=args.check_interval)
-    else:  # once
-        success = manager.run_once()
+    else:
+        # Default: run as service with configured schedulers
+        success = manager.run_scheduler(check_interval=60)
     
     sys.exit(0 if success else 1)
 
