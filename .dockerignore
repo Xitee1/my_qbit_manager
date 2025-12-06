@@ -26,10 +26,6 @@ tests/
 .coverage
 htmlcov/
 
-# Documentation
-*.md
-docs/
-
 # Development
 .env
 .env.example

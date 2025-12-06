@@ -13,8 +13,9 @@ RUN apt-get update && \
 # Copy project files
 COPY . /app
 
-# Install Python dependencies
-RUN pip install --no-cache-dir --user .
+# Install the package and dependencies globally (not --user)
+# This ensures they're accessible to all users in the final stage
+RUN pip install --no-cache-dir .
 
 # Final stage
 FROM python:3.11-slim
@@ -23,10 +24,8 @@ FROM python:3.11-slim
 WORKDIR /app
 
 # Copy Python dependencies from builder
-COPY --from=builder /root/.local /root/.local
-
-# Make sure scripts in .local are usable
-ENV PATH=/root/.local/bin:$PATH
+COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
+COPY --from=builder /usr/local/bin /usr/local/bin
 
 # Copy application code
 COPY src/ ./src/
@@ -51,5 +50,3 @@ HEALTHCHECK --interval=5m --timeout=3s \
 # Default entrypoint - can be overridden for different service modes
 ENTRYPOINT ["python", "-m", "my_qbit_manager.main"]
 
-# Default command - run in scheduler mode
-CMD ["--mode", "scheduler"]
