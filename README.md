@@ -1,4 +1,6 @@
-# qBittorrent Manager
+# WIP: qBittorrent Manager
+
+_Warning: This is a vibe coded tool, most of it is unchecked because I personally do not give it a high priority, it must just work for me. Maybe I'll improve it in the future and clean up the AI shit a bit more_
 
 A modular, extensible tool for managing qBittorrent torrents with automatic tracker health monitoring and other automation features.
 
