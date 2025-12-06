@@ -29,10 +29,9 @@ COPY --from=builder /usr/local/bin /usr/local/bin
 
 # Copy application code
 COPY src/ ./src/
-COPY config/ ./config/
 
-# Create logs directory
-RUN mkdir -p /app/logs
+# Create directories that will be used to avoid permission problems
+RUN mkdir -p /app/config
 
 # Set Python path
 ENV PYTHONPATH=/app/src:$PYTHONPATH

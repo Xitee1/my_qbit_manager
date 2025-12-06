@@ -44,3 +44,9 @@ qbit-manager = "my_qbit_manager.main:main"
 
 [tool.hatch.version]
 source = "vcs"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/my_qbit_manager"]
+
+[tool.hatch.build.targets.wheel.force-include]
+"src/my_qbit_manager/config.default.yaml" = "my_qbit_manager/config.default.yaml"

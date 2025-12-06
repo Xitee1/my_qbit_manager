@@ -2,6 +2,7 @@
 
 import logging
 import os
+import shutil
 from pathlib import Path
 from typing import Any, Dict
 
@@ -22,22 +23,27 @@ class ConfigManager:
         """
         self.config_path = config_path
         self.config: Dict[str, Any] = {}
+        
+        # Path to the default config template (bundled with the package)
+        self.default_config_template = Path(__file__).parent / "config.default.yaml"
 
     def load_config(self) -> Dict[str, Any]:
         """
         Load configuration from YAML file and merge with environment variables.
         
         Environment variables take priority over config.yaml for qBittorrent settings.
+        If the configuration file doesn't exist, a default one will be created.
 
         Returns:
             Dictionary containing the merged configuration
 
         Raises:
-            FileNotFoundError: If the configuration file doesn't exist
             yaml.YAMLError: If the configuration file is invalid
         """
         if not self.config_path.exists():
-            raise FileNotFoundError(f"Configuration file not found: {self.config_path}")
+            logger.warning("Configuration file not found: %s", self.config_path)
+            self._create_default_config()
+            logger.info("Created default configuration file at %s", self.config_path)
 
         logger.info("Loading configuration from %s", self.config_path)
 
@@ -52,6 +58,30 @@ class ConfigManager:
 
         logger.info("Configuration loaded successfully")
         return self.config
+
+    def _create_default_config(self):
+        """
+        Create a default configuration file by copying from the template.
+        
+        Creates the parent directory if it doesn't exist and copies the default
+        configuration template from config/config.yaml to the target location.
+        """
+        # Create parent directory if it doesn't exist
+        self.config_path.parent.mkdir(parents=True, exist_ok=True)
+        
+        # Check if default template exists
+        if not self.default_config_template.exists():
+            logger.error("Default config template not found at %s", self.default_config_template)
+            raise FileNotFoundError(
+                f"Default configuration template not found at {self.default_config_template}. "
+                "Please ensure config/config.yaml exists in the repository."
+            )
+        
+        # Copy the default configuration template
+        shutil.copy2(self.default_config_template, self.config_path)
+        
+        logger.info("Default configuration file created at %s (copied from %s)", 
+                   self.config_path, self.default_config_template)
 
     def _apply_env_overrides(self):
         """

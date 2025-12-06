@@ -14,8 +14,7 @@ services:
     
     # Mount volumes
     volumes:
-      # Configuration file
-      - ./config/config.yaml:/app/config/config.yaml:ro
+      - ./data/config:/app/config
 
       # Development: mount source code for live changes
       - ./src/my_qbit_manager:/app/src/my_qbit_manager:ro

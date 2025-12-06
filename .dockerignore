@@ -44,4 +44,4 @@ docker-compose.*.yml
 .travis.yml
 
 # Project specific
-data
+data/
