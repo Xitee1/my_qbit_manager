@@ -4,6 +4,9 @@ services:
       context: .
       dockerfile: Dockerfile
     
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
     # Mount volumes
     volumes:
       - ./data/config:/app/config
