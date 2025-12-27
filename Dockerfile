@@ -30,17 +30,11 @@ COPY --from=builder /usr/local/bin /usr/local/bin
 # Copy application code
 COPY src/ ./src/
 
-# Create directories that will be used to avoid permission problems
-RUN mkdir -p /app/config
 
 # Set Python path
 ENV PYTHONPATH=/app/src:$PYTHONPATH
-
 # Set non-root user for security
-RUN useradd -m -u 1000 qbitmanager && \
-    chown -R qbitmanager:qbitmanager /app
 
-USER qbitmanager
 
 # Health check
 HEALTHCHECK --interval=5m --timeout=3s \

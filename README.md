@@ -5,19 +5,19 @@ _Warning: This is a vibe coded tool, most of it is unchecked because I personall
 A modular, extensible tool for managing qBittorrent torrents with automatic tracker health monitoring and other automation features.
 
 ## Installation
-1. Create a new docker-compose.yaml file
 
-2. Copy the content of docker-compose.prod.yaml
 
-3. Start with:
+1. **Create docker-compose.yaml** and copy the content from `docker-compose.prod.yaml`
+
+2. **Start the container**:
    ```bash
    docker-compose up -d
    ```
 
-3. **Edit the configuration**:
+4. **Edit the configuration**:
+   Stop the container again and edit the configuration.
    ```bash
    nano config/config.yaml
-   # Configure your qBittorrent connection and module settings
    ```
 
 
