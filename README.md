@@ -1,3 +1,6 @@
+# Archived
+### because qui has most of my planned features built in and is way nicer: https://github.com/autobrr/qui
+
 # WIP: qBittorrent Manager
 
 _Warning: This is a vibe coded tool, most of it is unchecked because I personally do not give it a high priority, it must just work for me. Maybe I'll improve it in the future and clean up the AI shit a bit more_
